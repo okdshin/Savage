@@ -1,0 +1,10 @@
+directories = ["example"]
+
+def options(opt):
+	opt.recurse(directories)
+
+def configure(conf):
+	conf.recurse(directories)
+
+def build(bld):
+    bld.recurse(directories)
