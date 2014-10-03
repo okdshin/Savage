@@ -1,10 +1,10 @@
-directories = ["clock"]
+directories = []
 
 def options(opt):
-	opt.recurse(directories)
+    opt.recurse(directories)
 
 def configure(conf):
-	conf.recurse(directories)
+    conf.recurse(directories)
 
 def build(bld):
     bld.recurse(directories)

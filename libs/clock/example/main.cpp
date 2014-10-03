@@ -1,5 +1,5 @@
 #include <iostream>
-#include <savage/clock.h>
+#include <savage/clock.hpp>
 
 using namespace savage;
 
