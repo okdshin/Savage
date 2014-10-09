@@ -2,6 +2,7 @@
 #define SAVAGE_RENDERER_ENTITY_HPP
 //20140917
 #include <savage/opengl.hpp>
+#include <savage/shader/texture.hpp>
 #include <savage/3rdparty/tinyobjloader/tiny_obj_loader.h>
 #include <savage/3rdparty/tinyobjloader/tiny_obj_loader.cc>
 namespace savage {
@@ -18,11 +19,13 @@ namespace savage {
 			class entity {
 			public:
 				explicit entity(
+					savage::shader::program const& program,
 					savage::shader::attribute const& position_attribute,
 					savage::shader::attribute const& color_attribute,
 					savage::shader::attribute const& normal_attribute,
 					savage::shader::attribute const& texcoord_attribute
 				) : 
+					program_(program),
 					count_(0),
 					position_attribute_(position_attribute), 
 					color_attribute_(color_attribute), 
@@ -31,7 +34,8 @@ namespace savage {
 					vertex_array_(), 
 					buffer_pool_() {}
 
-				void load(boost::filesystem::path const& filename) {
+				//TODO
+				void load(std::string const& filename) {
 					std::vector<tinyobj::shape_t> shapes;
 					std::vector<tinyobj::material_t> materials;
 					char const* parent = "";
@@ -64,6 +68,11 @@ namespace savage {
 								));
 							}
 						}
+						auto image = savage::shader::load_png("tree/bark_loo.png");
+						texture_ = std::make_unique<savage::shader::texture>(0);
+						savage::shader::set_image<GL_RGB>(*texture_, image);
+						savage::shader::set_texture_uniform(program_, 
+							savage::shader::uniform("sampler2D", "DiffuseTexture"), *texture_);
 					}
 					count_ = position_data.size();
 					set_vertex_buffer(position_attribute_, position_data);
@@ -91,6 +100,7 @@ namespace savage {
 					buffer_pool_.emplace_back(std::move(vertex_buffer));
 				}
 				
+				savage::shader::program const& program_;
 				std::size_t count_;
 				savage::shader::attribute 
 					position_attribute_, 
@@ -99,6 +109,7 @@ namespace savage {
 					texcoord_attribute_;
 				savage::shader::vertex_array vertex_array_;
 				std::vector<std::unique_ptr<savage::shader::vertex_buffer> > buffer_pool_;
+				std::unique_ptr<savage::shader::texture> texture_;
 			};
 		}// namespace entitys
 		using savage::renderer::entitys::entity;

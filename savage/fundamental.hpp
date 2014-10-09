@@ -4,6 +4,7 @@
 #include <savage/opengl.hpp>
 #include <GLFW/glfw3.h>
 namespace savage {
+	const float pi = 3.14159265358979323846264338327950;
 	struct opengl_utility_init_error : public std::exception {
 		virtual char const* what() const throw() {
 			return "opengl utility initializing failed.";

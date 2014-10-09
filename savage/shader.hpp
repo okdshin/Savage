@@ -11,4 +11,5 @@
 #include <savage/shader/vertex_array.hpp>
 #include <savage/shader/image.hpp>
 #include <savage/shader/texture.hpp>
+#include <savage/shader/source_generator.hpp>
 #endif //SAVAGE_SHADER_HPP

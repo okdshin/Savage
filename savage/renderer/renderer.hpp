@@ -3,41 +3,68 @@
 //20140917
 #include <savage/shader.hpp>
 namespace savage {
-	namespace renderers {
-		class renderer {
+	namespace renderer {
+		class scene_manager {
 		public:
-			void initialize() {
-				program_ = savage::shader::create_program();
-			}
-			template<GLuint shader_type>
-			void attach(boost::filesystem::path const& filepath) {
-				savage::shader::objects::object object = 
-					savage::shader::objects::create_object<type>();
+			scene_manager() : 
+				program_(), 
+				model_matrix_uniform_("ModelMatrix"), 
+				normal_matrix_uniform_("NormalMatrix"),
+				position_attribute_(0, "VertexPosition"),
+				color_attribute_(1, "VertexColor"),
+				normal_attribute_(2, "VertexNormal"),
+				texcoord_attribute_(3, "VertexTexCoord") {}
 
-				savage::shader::objects::load_source(object, object_filepath);
-				savage::shader::objects::compile(object);
-				savage::shader::programs::attach(program_, object);
-				shader_object_vect_.emplace_back(object);
+			void init_shader(
+				boost::filesystem::path const& vertex_shader_filepath, 
+				boost::filesystem::path const& frag_shader_filepath
+			) {
+				savage::shader::attach<GL_VERTEX_SHADER>(program_, vertex_shader_filepath);
+				savage::shader::attach<GL_FRAGMENT_SHADER>(program_, frag_shader_filepath);
+				savage::shader::bind_attribute(program_, position_attribute_);
+				savage::shader::bind_attribute(program_, color_attribute_);
+				savage::shader::bind_attribute(program_, normal_attribute_);
+				savage::shader::bind_attribute(program_, texcoord_attribute_);
+				savage::shader::link(program_);
+				savage::shader::use(program_);
 			}
-			void add_scene_node(
-			void render() {
-				for(auto& model_object : model_object_vect_) {
-					model_object.draw();
-				}
+
+			savage::renderer::scene_node* 
+			add_scene_node(
+				savage::shader::entity const& entity, 
+				glm::mat4 const& model_matrix
+			) {
+				scene_nodes_.emplace_back(
+					std::make_unique<savage::renderer::scene_node>(
+						entity, 
+						model_matrix
+					)
+				);
+				return scene_nodes_.back().get();
 			}
-			void finalize() {
-				for(auto& model_object : model_object_vect_) {
-					savage::renderer::model_objects::delete_model(model_object);
+
+			void render() const {
+				for(auto& scene_node : scene_nodes_) {
+					savage::shader::set_uniform(program_, 
+						model_matrix_uniform_, 
+						scene_node->model_matrix()
+					);
+					savage::shader::set_uniform(program_, 
+						normal_matrix_uniform_,
+						glm::transpose(glm::inverse(view_mat*scene_node->model_matrix()))
+					);
+					scene_node.render();
 				}
-				for(auto& shader_object : shader_object_vect_) {
-					savage::shader::delete_object(shader_object);	
-				}
-				savage::shader::delete_program(program_);
 			}
 		private:
 			savage::shader::program program_;
-			std::vector<savage::shader::object> shader_object_vect_;
-			savage::shader::vertex_array vao_;
+			savage::shader::uniform model_matrix_uniform_;
+			savage::shader::uniform normal_matrix_uniform_;
+			savage::shader::attribute position_attribute_(0, "VertexPosition");
+			savage::shader::attribute color_attribute_(1, "VertexColor");
+			savage::shader::attribute normal_attribute_(2, "VertexNormal");
+			savage::shader::attribute texcoord_attribute_(3, "VertexTexCoord");
+
 		};
 	}// namespace renderers
 	using savage::renderers::renderer;

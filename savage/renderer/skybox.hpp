@@ -7,6 +7,7 @@
 namespace savage {
 	namespace renderer {
 		namespace skyboxs {
+			/*
 			class skybox {
 				skybox(skybox const&) = delete;
 				skybox& operator=(skybox const&) = delete;
@@ -61,8 +62,9 @@ namespace savage {
 				savage::renderer::entity entity_;
 				glm::mat4 model_matrix_;
 			};
+			*/
 		}// namespace skyboxs
-		using savage::renderer::skyboxs::skybox;
+		//using savage::renderer::skyboxs::skybox;
 	}// namespace renderer
 }// namespace savage
 
