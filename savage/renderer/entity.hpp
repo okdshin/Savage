@@ -18,11 +18,13 @@ namespace savage {
 			class entity {
 			public:
 				explicit entity(
+					savage::shader::program const& program,
 					savage::shader::attribute const& position_attribute,
 					savage::shader::attribute const& color_attribute,
 					savage::shader::attribute const& normal_attribute,
 					savage::shader::attribute const& texcoord_attribute
 				) : 
+					program_(program),
 					count_(0),
 					position_attribute_(position_attribute), 
 					color_attribute_(color_attribute), 
@@ -91,6 +93,7 @@ namespace savage {
 					buffer_pool_.emplace_back(std::move(vertex_buffer));
 				}
 				
+				savage::shader::program const& program_;
 				std::size_t count_;
 				savage::shader::attribute 
 					position_attribute_, 
