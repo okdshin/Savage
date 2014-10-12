@@ -6,4 +6,5 @@
 #include <savage/shader.hpp>
 #include <savage/renderer.hpp>
 #include <savage/app_manager.hpp>
+#include <savage/linear_math.hpp>
 #endif //SAVAGE_SAVAGE_HPP
