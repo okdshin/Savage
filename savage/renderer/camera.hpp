@@ -8,9 +8,9 @@
 namespace savage {
 	namespace renderer {
 		namespace cameras {
-			class camera_projector {
+			class camera {
 			public:
-				camera_projector(
+				camera(
 					savage::shader::program const& program, 
 					savage::shader::uniform const& projection_matrix_uniform,
 					savage::shader::uniform const& view_matrix_uniform,
@@ -24,9 +24,8 @@ namespace savage {
 					view_matrix_uniform_(view_matrix_uniform),
 					angle_(angle), aspect_(aspect), near_(near), far_(far) {}
 
-				template<typename T>
 				void operator()(
-					savage::renderer::scene_node<T> const*const scene_node
+					savage::renderer::scene_node& scene_node
 				) const {
 					savage::shader::set_uniform(program_, 
 						projection_matrix_uniform_, 
@@ -39,7 +38,8 @@ namespace savage {
 							direction_on_xz, -savage::pi<float>::value/2.f);
 					glm::vec3 upper = glm::rotate(
 							direction, savage::pi<float>::value/2.f, axis);
-					savage::shader::set_uniform(program_, 
+					savage::shader::set_uniform(
+						program_, 
 						view_matrix_uniform_,
 						glm::lookAt(
 							position,
@@ -54,10 +54,7 @@ namespace savage {
 				float angle_, aspect_, near_, far_;
 			};
 		}// namespace cameras
-		using camera = savage::renderer::scene_node<
-			savage::renderer::cameras::camera_projector
-		>;
-		
+		using savage::renderer::cameras::camera;
 	}// namespace renderer
 }// namespace savage
 

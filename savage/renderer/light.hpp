@@ -2,13 +2,14 @@
 #define SAVAGE_RENDERER_LIGHT_HPP
 //20141007
 #include <savage/shader.hpp>
+#include <savage/linear_math.hpp>
 #include <savage/renderer/scene_node.hpp>
 namespace savage {
 	namespace renderer {
 		namespace lights {
-			class point_light_projector {
+			class point_light {
 			public:
-				point_light_projector(
+				point_light(
 					savage::shader::program const& program,
 					savage::shader::uniform const& ka_uniform,
 					savage::shader::uniform const& kd_uniform,
@@ -27,9 +28,8 @@ namespace savage {
 					ka_(ka), kd_(kd), ks_(ks),
 					color_(color) {}
 
-				template<typename T>
 				void operator()(
-					savage::renderer::scene_node<T> const*const scene_node
+					savage::renderer::scene_node& scene_node
 				) const {
 					savage::shader::set_uniform(program_, ka_uniform_, ka_);
 					savage::shader::set_uniform(program_, kd_uniform_, kd_);
@@ -54,9 +54,7 @@ namespace savage {
 				glm::vec3 color_;
 			};
 		}// namespace lights
-		using point_light = savage::renderer::scene_node<
-			savage::renderer::lights::point_light_projector
-		>;
+		using savage::renderer::lights::point_light;
 	}// namespace renderer
 }// namespace savage
 

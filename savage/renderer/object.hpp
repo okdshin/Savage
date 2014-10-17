@@ -6,29 +6,33 @@
 #include <savage/opengl.hpp>
 namespace savage {
 	namespace renderer {
-		class object_projector {
-		public:
-			object_projector(savage::shader::program const& program,
-				savage::shader::uniform const& model_matrix_uniform,
-				savage::renderer::entity const& entity
-			) : 
-				program_(program), 
-				model_matrix_uniform_(model_matrix_uniform), 
-				entity_(entity) {}
+		namespace objects {
+			class object {
+			public:
+				object(savage::shader::program const& program,
+					savage::shader::uniform const& model_matrix_uniform,
+					savage::renderer::entity const& entity
+				) : 
+					program_(program), 
+					model_matrix_uniform_(model_matrix_uniform), 
+					entity_(entity) {}
 
-			template<typename T>
-			void operator()(savage::renderer::scene_node<T>* scene_node) const {
-				set_uniform(program_, model_matrix_uniform_, 
-					scene_node->translation()*scene_node->rotation()*scene_node->scale());
-				entity_.render();
-			}
+				void operator()(savage::renderer::scene_node& scene_node) const {
+					savage::shader::set_uniform(
+						program_, 
+						model_matrix_uniform_, 
+						savage::renderer::model_matrix(scene_node)
+					);
+					entity_.render();
+				}
 
-		private:
-			savage::shader::program const& program_;
-			savage::shader::uniform model_matrix_uniform_;
-			savage::renderer::entity const& entity_;
-		};
-		using object = savage::renderer::scene_node<object_projector>;
+			private:
+				savage::shader::program const& program_;
+				savage::shader::uniform model_matrix_uniform_;
+				savage::renderer::entity const& entity_;
+			};
+		}// namespace objects
+		using savage::renderer::objects::object;
 	}// namespace renderer
 }// namespace savage
 
