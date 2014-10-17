@@ -2,6 +2,7 @@
 #define SAVAGE_RENDERER_CAMERA_HPP
 //20141003
 #include <savage/opengl.hpp>
+#include <savage/linear_math.hpp>
 #include <savage/shader.hpp>
 #include <savage/renderer/scene_node.hpp>
 namespace savage {

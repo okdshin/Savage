@@ -65,13 +65,14 @@ namespace savage {
 								glm::rotate(
 									local_rotation(), 
 									roll,
-									glm::vec3(0.f, 0.f, 1.f)
+									glm::vec3(local_rotation()
+										*glm::vec4(0.f, 0.f, -1.f, 0.0))
 								), 
 								pitch,
-								glm::vec3(0.f, 1.f, 0.f)
+								glm::vec3(local_rotation()*glm::vec4(0.f, 1.f, 0.f, 0.0))
 							), 
 							yaw,
-							glm::vec3(1.f, 0.f, 0.f)
+							glm::vec3(local_rotation()*glm::vec4(1.f, 0.f, 0.f, 0.0))
 						)
 					);
 					return this;	
@@ -110,7 +111,7 @@ namespace savage {
 								glm::rotate(
 									rotation_, 
 									roll,
-									glm::vec3(0.f, 0.f, 1.f)
+									glm::vec3(0.f, 0.f, -1.f)
 								), 
 								pitch,
 								glm::vec3(0.f, 1.f, 0.f)

@@ -64,6 +64,9 @@ namespace savage {
 	using savage::clocks::basic_clock;
 	typedef savage::basic_clock<std::chrono::microseconds> clock;
 
+	double second(savage::clock const& clock) {
+		return clock.current_time().count()*0.001*0.001;
+	}
 	double delta_second(savage::clock const& clock) {
 		return clock.delta_time().count()*0.001*0.001;
 	}

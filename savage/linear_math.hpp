@@ -3,6 +3,7 @@
 //20141009
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/transform.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 namespace savage {
 	template<typename T>
 	struct pi {
