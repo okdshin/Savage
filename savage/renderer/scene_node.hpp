@@ -18,17 +18,16 @@ namespace savage {
 					parent_(parent),
 					projector_(projector),
 					children_(),
-					translation_(parent_->translation()),
-					rotation_(parent_->rotation()),
-					scale_(parent_->scale()) {}
+					local_translation_(),
+					local_rotation_(),
+					local_scale_() {}
 				
-				scene_node() : 
-					parent_(nullptr), 
-					projector_([](scene_node&){}),
-					children_(),
-					translation_(glm::mat4()),
-					rotation_(glm::mat4()),
-					scale_(glm::mat4()) {}
+				scene_node() : scene_node(nullptr, [](scene_node&){}) {}
+
+				template<typename T>
+				typename T::return_type chain(T const& t) {
+					return t(*this);
+				}
 
 				scene_node* parent() const { return parent_; }
 
@@ -44,39 +43,60 @@ namespace savage {
 					return children_.back().get();
 				}
 
-				glm::mat4 translation() const { return translation_; }
-				glm::mat4 rotation() const { return rotation_; }
-				glm::mat4 scale() const { return scale_; }
-				void translation(glm::mat4 const& tran) { translation_ = tran; }
-				void rotation(glm::mat4 const& rot) { rotation_ = rot; }
-				void scale(glm::mat4 const& sca) { scale_ = sca; }
+				glm::mat4 translation() const {
+					return parent() ? 
+						parent()->translation()*local_translation_ : 
+						local_translation_;
+				}
+				glm::mat4 rotation() const {
+					return parent() ?
+						parent()->rotation()*local_rotation_ :
+						local_rotation_;
+				}
+				glm::mat4 scale() const {
+					return parent() ?
+						parent()->scale()*local_scale_ :
+						local_scale_;
+				}
+				void translation(glm::mat4 const& tran) {
+					assert("parent is null" && parent());
+					local_translation(glm::inverse(parent()->translation())*tran);
+				}
+				void rotation(glm::mat4 const& rot) {
+					assert("parent is null" && parent());
+					local_rotation(glm::inverse(parent()->rotation())*rot);
+				}
+				void scale(glm::mat4 const& sca) {
+					assert("parent is null" && parent());
+					local_scale(glm::inverse(parent()->scale())*sca);
+				}
 
 				glm::mat4 local_translation() const {
-					return glm::inverse(parent_->translation())*translation_; 
+					return local_translation_;
 				}
 				glm::mat4 local_rotation() const {
-					return glm::inverse(parent_->rotation())*rotation_;
+					return local_rotation_;
 				}
 				glm::mat4 local_scale() const {
-					return glm::inverse(parent_->scale())*scale_;
+					return local_scale_;
 				}
 				void local_translation(glm::mat4 const& ltran) {
-					translation(parent_->translation()*ltran);
+					local_translation_ = ltran;
 				}
 				void local_rotation(glm::mat4 const& lrot) {
-					rotation(parent_->rotation()*lrot);
+					local_rotation_ = lrot;
 				}
 				void local_scale(glm::mat4 const& lsca) {
-					scale(parent_->scale()*lsca);
+					local_scale_ = lsca;
 				}
 
 			private:
 				scene_node* parent_;
 				projector_type projector_;
 				std::vector<std::unique_ptr<scene_node>> children_;
-				glm::mat4 translation_;
-				glm::mat4 rotation_;
-				glm::mat4 scale_;
+				glm::mat4 local_translation_;
+				glm::mat4 local_rotation_;
+				glm::mat4 local_scale_;
 			};
 		}// namespace scene_nodes
 		using savage::renderer::scene_nodes::scene_node;

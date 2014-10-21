@@ -40,6 +40,14 @@ namespace savage {
 				std::vector<std::unique_ptr<savage::renderer::entity>> entities_;
 			};
 		}// namespace entity_managers
+		savage::renderer::entity* make_terrain(
+			savage::renderer::entity_manager& entity_manager,
+			//TODO const& height_map,
+			savage::shader::image const& texture_image,
+		) {
+
+		}
+
 		using savage::renderer::entity_managers::entity_manager;
 		struct entity_load_error : public std::exception {
 			entity_load_error(std::string const& message) : message_(message) {}

@@ -27,6 +27,13 @@ namespace savage {
 				void operator()(
 					savage::renderer::scene_node& scene_node
 				) const {
+					/*
+					if(scene_node.parent()) {
+						auto newpos = savage::renderer::position(*scene_node.parent())+
+							savage::renderer::position(scene_node);
+						savage::renderer::translate(scene_node, newpos);
+					}
+					*/
 					savage::shader::set_uniform(program_, 
 						projection_matrix_uniform_, 
 						glm::perspective(angle_, aspect_, near_, far_)

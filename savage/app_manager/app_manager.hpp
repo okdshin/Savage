@@ -106,6 +106,9 @@ namespace savage {
 			savage::cursor_position_callback
 		);
 	}
+	int get_key(int key) {
+		return glfwGetKey(savage::window_manager::instance().window().handle(), key);
+	}
 }// namespace savage
 
 #endif //SAVAGE_APP_MANAGER_APP_MANAGER_HPP

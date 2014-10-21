@@ -74,11 +74,21 @@ namespace savage {
 				translate(float x, float y, float z) {
 					return translate(glm::vec3(x, y, z));
 				}
+				savage::renderer::scene_node* chain_end() {
+					return &scene_node_;
+				}
 			private:
 				savage::renderer::scene_node& scene_node_;
 			};
 		}// namespace scene_node_transform_chains
 		using savage::renderer::scene_node_transform_chains::scene_node_transform_chain;
+		class scene_node_transform_chain_generator {
+		public:
+			using return_type = savage::renderer::scene_node_transform_chain;
+			return_type operator()(savage::renderer::scene_node& sn) const {
+				return savage::renderer::scene_node_transform_chain(sn);
+			}
+		};
 		savage::renderer::scene_node_transform_chain
 		transform_chain(scene_node& scene_node) {
 			return savage::renderer::scene_node_transform_chain(scene_node);
