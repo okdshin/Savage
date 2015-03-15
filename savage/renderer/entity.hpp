@@ -42,13 +42,14 @@ namespace savage {
 			public:
 				explicit entity(
 					savage::shader::program const& program,
-					entity_info const& info
+					entity_info const& info,
+					std::size_t texture_id
 				) : 
 					program_(program),
 					info_(info),
 					vertex_array_(), 
 					buffer_pool_(),
-					kd_texture_(0),
+					kd_texture_(texture_id),
 					kd_tex_image_(),
 					vertex_count_(0) {}
 
@@ -63,15 +64,15 @@ namespace savage {
 					set_vertex_buffer(info_.normal_attribute(), normal_data);
 					set_vertex_buffer(info_.texcoord_attribute(), texcoord_data);
 					kd_tex_image_ = kd_tex_image;
+					savage::shader::set_image<GL_RGB>(kd_texture_, kd_tex_image_);
+					std::cout << "texture id: " << kd_texture_.id() << std::endl;
 				}
 				
 				void render() const {
-					savage::shader::set_image<GL_RGB>(kd_texture_, kd_tex_image_);
-					savage::shader::set_texture_uniform(
-						program_, 
-						info_.kd_tex_uniform(),
-						kd_texture_
-					);
+					//TODO
+					glActiveTexture(GL_TEXTURE0+kd_texture_.id());
+					glBindTexture(GL_TEXTURE_2D, kd_texture_.handle());
+					savage::shader::set_texture_uniform(program_, info_.kd_tex_uniform(), kd_texture_);
 					savage::shader::bind(vertex_array_);
 					glDrawArrays(GL_TRIANGLES, 0, vertex_count_);
 				}

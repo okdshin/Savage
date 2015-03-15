@@ -14,7 +14,7 @@ def configure(conf):
 def build(bld):
     bld.program(features = "cxx cprogram",
         source = "main.cpp",
-        cxxflags = ["-std=c++14", "-g", "-Wall", "-Wno-unused-variable"],
+        cxxflags = ["-std=c++14", "-g", "-Wall", "-Wno-unused-variable", "-DSAVAGE_USE_PHYSICS"],
         target = "a.out",
         libpath = ["../../../savage/3rdparty/soil/lib"],
         lib = ["GL", "GLEW", "SOIL", "glfw", "boost_system", "boost_filesystem", 

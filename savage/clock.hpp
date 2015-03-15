@@ -12,7 +12,9 @@ namespace savage {
 				time_point_type;
 		
 			explicit basic_clock(float scale=1.0) : 
-					amount_(0), delta_amount_(0), scale_(scale), is_paused_(false) {
+					amount_(0), delta_amount_(0), scale_(scale), is_paused_(false), 
+					frame_count_(0)
+			{
 				last_update_time_ = now();
 			}
 
@@ -27,6 +29,7 @@ namespace savage {
 				delta_amount_ = std::chrono::duration_cast<duration_type>(scale_*delta);
 				amount_ += std::chrono::duration_cast<duration_type>(scale_*delta);
 				last_update_time_ = n;
+				++frame_count_;
 			}
 
 			duration_type current_time() const {
@@ -35,6 +38,10 @@ namespace savage {
 
 			duration_type delta_time() const {
 				return delta_amount_;
+			}
+
+			float fps() const {
+				return frame_count_/(current_time().count()*0.001*0.001);
 			}
 
 
@@ -59,6 +66,7 @@ namespace savage {
 			duration_type amount_, delta_amount_;
 			float scale_;
 			bool is_paused_;
+			unsigned int frame_count_;
 		};
 	}
 	using savage::clocks::basic_clock;

@@ -7,4 +7,7 @@
 #include <savage/renderer.hpp>
 #include <savage/app_manager.hpp>
 #include <savage/linear_math.hpp>
+#ifdef SAVAGE_USE_PHYSICS
+#include <savage/physics.hpp>
+#endif
 #endif //SAVAGE_SAVAGE_HPP

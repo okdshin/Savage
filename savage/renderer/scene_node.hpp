@@ -18,9 +18,9 @@ namespace savage {
 					parent_(parent),
 					projector_(projector),
 					children_(),
-					local_translation_(),
-					local_rotation_(),
-					local_scale_() {}
+					translation_(),
+					rotation_(),
+					scale_() {}
 				
 				scene_node() : scene_node(nullptr, [](scene_node&){}) {}
 
@@ -44,107 +44,55 @@ namespace savage {
 				}
 
 				glm::mat4 translation() const {
-					return parent() ? 
-						parent()->translation()*local_translation_ : 
-						local_translation_;
+					return translation_;
 				}
 				glm::mat4 rotation() const {
-					return parent() ?
-						parent()->rotation()*local_rotation_ :
-						local_rotation_;
+					return rotation_;
 				}
 				glm::mat4 scale() const {
-					return parent() ?
-						parent()->scale()*local_scale_ :
-						local_scale_;
+					return scale_;
 				}
 				void translation(glm::mat4 const& tran) {
-					assert("parent is null" && parent());
-					local_translation(glm::inverse(parent()->translation())*tran);
+					translation_ = tran;
 				}
 				void rotation(glm::mat4 const& rot) {
-					assert("parent is null" && parent());
-					local_rotation(glm::inverse(parent()->rotation())*rot);
+					rotation_ = rot;
 				}
 				void scale(glm::mat4 const& sca) {
-					assert("parent is null" && parent());
-					local_scale(glm::inverse(parent()->scale())*sca);
+					scale_ = sca;
 				}
 
-				glm::mat4 local_translation() const {
-					return local_translation_;
-				}
-				glm::mat4 local_rotation() const {
-					return local_rotation_;
-				}
-				glm::mat4 local_scale() const {
-					return local_scale_;
-				}
-				void local_translation(glm::mat4 const& ltran) {
-					local_translation_ = ltran;
-				}
-				void local_rotation(glm::mat4 const& lrot) {
-					local_rotation_ = lrot;
-				}
-				void local_scale(glm::mat4 const& lsca) {
-					local_scale_ = lsca;
-				}
+				decltype(auto) children() { return (children_); }
+				decltype(auto) children() const { return (children_); }
 
 			private:
 				scene_node* parent_;
 				projector_type projector_;
 				std::vector<std::unique_ptr<scene_node>> children_;
-				glm::mat4 local_translation_;
-				glm::mat4 local_rotation_;
-				glm::mat4 local_scale_;
+				glm::mat4 translation_;
+				glm::mat4 rotation_;
+				glm::mat4 scale_;
 			};
 		}// namespace scene_nodes
 		using savage::renderer::scene_nodes::scene_node;
 
-		void scale_local(scene_node& sn, glm::vec3 const& v) {
-			sn.local_scale(
-				glm::scale(
-					sn.local_scale(), 
-					glm::vec3(sn.local_rotation()*glm::vec4(v, 0.0))
-				)
-			);
+		glm::mat4 local_translation(savage::renderer::scene_node const& sn) {
+			return glm::inverse(sn.parent()->translation())*sn.translation();
 		}
-		void rotate_local(scene_node& sn, glm::vec3 const& v) {
-			sn.local_rotation(
-				glm::rotate(
-					glm::rotate(
-						glm::rotate(
-							sn.local_rotation(), 
-							v[0],
-							glm::vec3(sn.local_rotation()
-								*glm::vec4(0.f, 0.f, -1.f, 0.0))
-						), 
-						v[1],
-						glm::vec3(sn.local_rotation()*glm::vec4(0.f, 1.f, 0.f, 0.0))
-					), 
-					v[2],
-					glm::vec3(sn.local_rotation()*glm::vec4(1.f, 0.f, 0.f, 0.0))
-				)
-			);
+		glm::mat4 local_rotation(savage::renderer::scene_node const& sn) {
+			return glm::inverse(sn.parent()->rotation())*sn.rotation();
 		}
-		void translate_local(scene_node& sn, glm::vec3 const& v) {
-			/*
-			translation_ = parent_.translation()
-				*local_translation()
-				*rotation()
-				*glm::translate(glm::mat4(), v)
-				;
-			*/
-			sn.local_translation(
-				glm::translate(sn.local_translation(),
-					glm::vec3(sn.local_rotation()*glm::vec4(v, 0.0))
-				)
-			);
+		glm::mat4 local_scale(savage::renderer::scene_node const& sn) {
+			return glm::inverse(sn.parent()->scale())*sn.scale();
 		}
-
+		
 		void scale(scene_node& sn, glm::vec3 const& v) {
 			sn.scale(glm::scale(sn.scale(), v));
 		}
+		void scale_local(scene_node& sn, glm::vec3 const& v) {
+			savage::renderer::scale(sn, glm::vec3(sn.rotation()*glm::vec4(v, 0.f)));
+		}
+
 		void rotate(scene_node& sn, glm::vec3 const& v) {
 			sn.rotation(
 				glm::rotate(
@@ -162,9 +110,31 @@ namespace savage {
 				)
 			);
 		}
+		void rotate_local(scene_node& sn, glm::vec3 const& v) {
+			sn.rotation(
+				glm::rotate(
+					glm::rotate(
+						glm::rotate(
+							sn.rotation(), 
+							v[0],
+							glm::vec3(sn.rotation()*glm::vec4(0.f, 0.f, -1.f, 0.0))
+						), 
+						v[1],
+						glm::vec3(sn.rotation()*glm::vec4(0.f, 1.f, 0.f, 0.0))
+					), 
+					v[2],
+					glm::vec3(sn.rotation()*glm::vec4(1.f, 0.f, 0.f, 0.0))
+				)
+			);
+		}
+
 		void translate(scene_node& sn, glm::vec3 const& v) {
 			sn.translation(glm::translate(sn.translation(), v));
 		}
+		void translate_local(scene_node& sn, glm::vec3 const& v) {
+			savage::renderer::translate(sn, glm::vec3(sn.rotation()*glm::vec4(v, 0.f)));
+		}
+
 		glm::mat4 model_matrix(scene_node const& sn) {
 			return sn.translation()*sn.rotation()*sn.scale();
 		}
@@ -174,6 +144,14 @@ namespace savage {
 		glm::vec3 direction(scene_node const& sn) {
 			return glm::vec3(sn.rotation()*glm::vec4(0.f, 0.f, -1.f, 0.f));
 		}
+		void position(scene_node& sn, glm::vec3 const& pos) {
+			sn.translation(glm::translate(glm::mat4(), pos));
+		}
+		/*
+		void direction(scene_node& sn, ) {
+			sn.rotation(glm::rotation(glm::mat4, ));
+		}
+		*/
 
 	}// namespace renderer
 }// namespace savage

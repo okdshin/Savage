@@ -29,7 +29,7 @@ namespace savage {
 				savage::renderer::entity*
 				create_entity() {
 					entities_.emplace_back(std::make_unique<savage::renderer::entity>(
-						program_, entity_info_
+						program_, entity_info_, entities_.size()
 					));
 					return entities_.back().get();
 				}
@@ -40,6 +40,7 @@ namespace savage {
 				std::vector<std::unique_ptr<savage::renderer::entity>> entities_;
 			};
 		}// namespace entity_managers
+		/*
 		savage::renderer::entity* make_terrain(
 			savage::renderer::entity_manager& entity_manager,
 			//TODO const& height_map,
@@ -47,6 +48,7 @@ namespace savage {
 		) {
 
 		}
+		*/
 
 		using savage::renderer::entity_managers::entity_manager;
 		struct entity_load_error : public std::exception {

@@ -4,6 +4,7 @@
 #include <savage/renderer/entity.hpp>
 #include <savage/renderer/entity_manager.hpp>
 #include <savage/renderer/scene_node.hpp>
+#include <savage/renderer/parent_transform_inheritor.hpp>
 #include <savage/renderer/object.hpp>
 #include <savage/renderer/animated_object.hpp>
 #include <savage/renderer/skybox.hpp>
